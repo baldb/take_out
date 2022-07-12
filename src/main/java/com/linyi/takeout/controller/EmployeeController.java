@@ -61,4 +61,15 @@ public class EmployeeController {
 
         return R.success(employeeRes);
     }
+
+    /**
+     * 退出员工登陆系统
+     * @param request
+     * @return
+     */
+    @PostMapping("/logout")
+    public R logout(HttpServletRequest request){
+        request.getSession().removeAttribute("employee");
+        return R.success("退出成功");
+    }
 }
