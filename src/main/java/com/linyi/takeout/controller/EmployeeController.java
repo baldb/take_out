@@ -1,16 +1,15 @@
 package com.linyi.takeout.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.linyi.takeout.common.R;
 import com.linyi.takeout.pojo.Employee;
 import com.linyi.takeout.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -103,5 +102,27 @@ public class EmployeeController {
         //新增员工信息
         employeeService.save(employee);
         return R.success("新增员工成功");
+    }
+
+
+    /**
+     *     http://localhost:8080/employee/page?page=1&pageSize=2
+     * http://localhost:8080/employee/page?page=1&pageSize=2&name=%E5%BC%A0%E4%B8%89
+     */
+    @GetMapping("/page")
+    public R<Page<Employee>> page(int page, int pageSize, String name) {
+        log.info("page = {},pageSize = {},name = {}", page, pageSize, name);
+        //构造分页构造器
+        Page<Employee> pageInfo = new Page(page, pageSize);
+
+        //根据姓名查询时的条件分页查询
+        LambdaQueryWrapper<Employee> wrapper = new LambdaQueryWrapper<>();
+        //当name不为空时，条件才会生效
+        wrapper.like(StringUtils.isNotEmpty(name), Employee::getName, name);
+        //添加排序条件,根据更新时间进行降序排序
+        wrapper.orderByDesc(Employee::getUpdateTime);
+        employeeService.page(pageInfo, wrapper);
+
+        return R.success(pageInfo);
     }
 }
