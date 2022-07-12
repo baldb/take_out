@@ -35,7 +35,7 @@ public class LoginCheckFilter implements Filter {
      */
     //用来进行路径比较的
     //路径匹配器，支持通配符
-    public static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+    public static final AntPathMatcher PATH_MATCHER =new AntPathMatcher();
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
