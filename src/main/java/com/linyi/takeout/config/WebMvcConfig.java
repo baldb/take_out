@@ -16,6 +16,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
     /**
      * 通过配置类进行静态资源映射的配置
+     * 没有该配置则不能直接通过url路径去访问静态资源
      * @param registry
      */
     @Override
