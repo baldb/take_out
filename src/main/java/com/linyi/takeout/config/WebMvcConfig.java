@@ -1,5 +1,6 @@
 package com.linyi.takeout.config;
 
+import com.linyi.takeout.common.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -30,6 +31,22 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         log.info("backend静态资源请求完成");
         registry.addResourceHandler("/front/**").addResourceLocations("classpath:/front/");
         log.info("front静态资源请求完成");
+    }
+
+
+    /**
+     * 扩展mvc框架的消息转换器
+     * @param converters
+     */
+    @Override
+    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        log.info("扩展消息转换器...");
+        //创建消息转换器对象，作用：将数据转为JSON
+        MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+        //设置对象转换器，底层使用Jackson将Java对象转为json
+        messageConverter.setObjectMapper(new JacksonObjectMapper());
+        //将上面的消息转换器对象追加到mvc框架的转换器集合中，index=0表示优先使用
+        converters.add(0,messageConverter);
     }
 
 }
