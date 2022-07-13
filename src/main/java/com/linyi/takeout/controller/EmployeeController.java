@@ -146,4 +146,20 @@ public class EmployeeController {
         return R.success("修改成功");
     }
 
+
+    /**
+     * 根据id查询员工信息
+     *  http://localhost:8080/employee/1546816935256219649
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable("id") Long id) {
+        log.info("根据id查询员工信息...");
+        Employee employee = employeeService.getById(id);
+        if (employee != null) {
+            return R.success(employee);
+        }
+        return R.error("没有查询到对应员工信息");
+    }
 }
