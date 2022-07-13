@@ -91,14 +91,15 @@ public class EmployeeController {
         //设置初始密码123456，需要进行md5加密处理
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
 
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        //这边注释是因为加了MyBatisPlus自动填充字段的功能
+        //employee.setCreateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
         //获得当前登录用户的id
         Long empId = (Long) request.getSession().getAttribute("employee");
         //设置创建人
-        employee.setCreateUser(empId);
+        //employee.setCreateUser(empId);
         //设置最后修改人
-        employee.setUpdateUser(empId);
+        //employee.setUpdateUser(empId);
         //新增员工信息
         employeeService.save(employee);
         return R.success("新增员工成功");
@@ -137,8 +138,11 @@ public class EmployeeController {
     public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
         //特别注意18位的id会不会造成精度缺失的问题
         log.info("修改的员工信息：{}",employee.toString());
+
+        log.info("线程ID：{}",Thread.currentThread().getId());
+        //这边注释是因为加了MyBatisPlus自动填充字段的功能
         //employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
         Long id = (Long) request.getSession().getAttribute("employee");
         employee.setUpdateUser(id);
         employeeService.updateById(employee);
