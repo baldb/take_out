@@ -125,4 +125,25 @@ public class EmployeeController {
 
         return R.success(pageInfo);
     }
+
+    /**
+     * 修改员工状态信息
+     * 修改其更新时间即可，不用修改创建时间
+     * @param request
+     * @param employee
+     * @return
+     */
+    @PutMapping
+    public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
+        //特别注意18位的id会不会造成精度缺失的问题
+        log.info("修改的员工信息：{}",employee.toString());
+        //employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+        Long id = (Long) request.getSession().getAttribute("employee");
+        employee.setUpdateUser(id);
+        employeeService.updateById(employee);
+
+        return R.success("修改成功");
+    }
+
 }
