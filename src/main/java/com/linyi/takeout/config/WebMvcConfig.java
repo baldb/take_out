@@ -17,11 +17,12 @@ import java.util.List;
  */
 @Slf4j
 @Configuration
-public class WebMvcConfig extends WebMvcConfigurationSupport {
+public class WebMvcConfig extends  WebMvcConfigurationSupport{
 
     /**
      * 通过配置类进行静态资源映射的配置
      * 没有该配置则不能直接通过url路径去访问静态资源
+     *
      * @param registry
      */
     @Override
@@ -31,11 +32,15 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         log.info("backend静态资源请求完成");
         registry.addResourceHandler("/front/**").addResourceLocations("classpath:/front/");
         log.info("front静态资源请求完成");
+
+
     }
+
 
 
     /**
      * 扩展mvc框架的消息转换器
+     *
      * @param converters
      */
     @Override
@@ -46,7 +51,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         //设置对象转换器，底层使用Jackson将Java对象转为json
         messageConverter.setObjectMapper(new JacksonObjectMapper());
         //将上面的消息转换器对象追加到mvc框架的转换器集合中，index=0表示优先使用
-        converters.add(0,messageConverter);
+        converters.add(0, messageConverter);
     }
 
 }
