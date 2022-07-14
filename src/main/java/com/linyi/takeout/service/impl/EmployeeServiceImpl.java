@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linyi.takeout.pojo.Employee;
 import com.linyi.takeout.service.EmployeeService;
 import com.linyi.takeout.mapper.EmployeeMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 * @createDate 2022-07-12 10:34:08
 */
 @Service
+@Slf4j
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee>
     implements EmployeeService{
 
