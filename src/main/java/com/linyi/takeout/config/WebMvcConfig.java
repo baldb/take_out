@@ -7,6 +7,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.List;
 
@@ -17,7 +19,7 @@ import java.util.List;
  */
 @Slf4j
 @Configuration
-public class WebMvcConfig extends  WebMvcConfigurationSupport{
+public class WebMvcConfig implements WebMvcConfigurer {
 
     /**
      * 通过配置类进行静态资源映射的配置
@@ -26,7 +28,7 @@ public class WebMvcConfig extends  WebMvcConfigurationSupport{
      * @param registry
      */
     @Override
-    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
         log.info("开始进行静态资源映射");
         registry.addResourceHandler("/backend/**").addResourceLocations("classpath:/backend/");
         log.info("backend静态资源请求完成");
@@ -44,7 +46,7 @@ public class WebMvcConfig extends  WebMvcConfigurationSupport{
      * @param converters
      */
     @Override
-    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         log.info("扩展消息转换器...");
         //创建消息转换器对象，作用：将数据转为JSON
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();

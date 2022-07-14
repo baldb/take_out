@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+
 /**
  * 分类管理
  */
@@ -58,4 +59,26 @@ public class CategoryController {
         categoryService.page(pageInfo, queryWrapper);
         return R.success(pageInfo);
     }
+
+
+
+    /**
+     * 根据id删除分类
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete( Long id) {
+        log.info("删除分类，id为：{}", id);
+
+        //categoryService.removeById(id);
+        categoryService.removeById(id);
+
+        return R.success("分类信息删除成功");
+    }
+
+
+
+
 }
