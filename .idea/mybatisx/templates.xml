@@ -5,7 +5,7 @@
       <TemplateContext>
         <option name="generateConfig">
           <GenerateConfig>
-            <option name="annotationType" value="NONE" />
+            <option name="annotationType" value="MYBATIS_PLUS3" />
             <option name="basePackage" value="com.linyi.takeout" />
             <option name="basePath" value="src/main/java" />
             <option name="classNameStrategy" value="camel" />
@@ -64,8 +64,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="Employee" />
-                  <option name="tableName" value="employee" />
+                  <option name="className" value="Category" />
+                  <option name="tableName" value="category" />
                 </TableUIInfo>
               </list>
             </option>
