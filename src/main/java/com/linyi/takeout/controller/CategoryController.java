@@ -85,7 +85,7 @@ public class CategoryController {
      */
     @PutMapping
     public R<String> update(@RequestBody Category category){
-
+        log.info("根据ID修改分类信息：{}",category.getId());
         boolean update = categoryService.updateById(category);
         if(update){
             return R.success("修改成功");

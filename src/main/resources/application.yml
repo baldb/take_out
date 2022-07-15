@@ -9,6 +9,12 @@ spring:
       url: jdbc:mysql://localhost:3306/heima_reggie?characterEncoding=utf8&useSSL=false&serverTimezone=CTT&rewriteBatchedStatements=true
       username: root
       password: root123
+  servlet:
+    multipart:
+      #设置单文件最大内存
+      max-file-size: 10MB
+      #设置多文件最大内存
+      max-request-size: 100MB
 
 
 mybatis-plus:
@@ -20,6 +26,9 @@ mybatis-plus:
     db-config:
       id-type: ASSIGN_ID
   mapper-locations: classpath:/mapper/**/*.xml
+
+reggie:
+  path: /Users/linyi/Desktop/JAVA/project/takeout/images/
 
 
 
