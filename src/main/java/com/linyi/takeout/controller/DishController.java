@@ -203,8 +203,8 @@ public class DishController {
          * 删除菜品：前提检查该菜品是否包含在某个套餐里面，没有即可删除
          * 删除：删除dish表中对应的菜品，还有DishFlavor表中对应菜品的口味，删除该菜品的图片，
          */
-
-        return null;
+        dishService.delDishByIds(ids);
+        return R.success("删除成功～～");
     }
 
     /**

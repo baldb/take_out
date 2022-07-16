@@ -4,6 +4,8 @@ import com.linyi.takeout.pojo.Dish;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linyi.takeout.vo.DishDto;
 
+import java.util.List;
+
 /**
 * @author linyi
 * @description 针对表【dish(菜品管理)】的数据库操作Service
@@ -32,4 +34,8 @@ public interface DishService extends IService<Dish> {
     void updateWithFlavor(DishDto dishDto);
 
 
+    /**
+     * 根据id删除
+     */
+    void  delDishByIds(List<Long> list);
 }

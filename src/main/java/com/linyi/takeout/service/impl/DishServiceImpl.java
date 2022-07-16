@@ -3,18 +3,23 @@ package com.linyi.takeout.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linyi.takeout.common.CustomException;
 import com.linyi.takeout.pojo.Dish;
 import com.linyi.takeout.pojo.DishFlavor;
+import com.linyi.takeout.pojo.SetmealDish;
 import com.linyi.takeout.service.DishFlavorService;
 import com.linyi.takeout.service.DishService;
 import com.linyi.takeout.mapper.DishMapper;
+import com.linyi.takeout.service.SetmealDishService;
 import com.linyi.takeout.vo.DishDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,6 +115,55 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish>
         dishFlavorService.saveBatch(flavors);
     }
 
+    @Autowired
+    private DishMapper dishMapper;
+
+    @Autowired
+    private SetmealDishService setmealDishService;
+
+    @Value("${reggie.path}")
+    private String Path;
+
+    /**
+     * 根据id 批量删除
+     * @param list
+     */
+    @Override
+    public void delDishByIds(List<Long> list) {
+        /**
+         * 业务逻辑：统一使用批量删除的方法
+         * 删除菜品：前提检查该菜品是否包含在某个套餐里面，没有即可删除
+         * 删除：删除dish表中对应的菜品，还有DishFlavor表中对应菜品的口味，删除该菜品的图片，
+         */
+        //判断该菜品是否在套餐中
+        LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        setmealDishLambdaQueryWrapper.in(SetmealDish::getDishId,list);
+        //判断是否为空，即判断是否有在套餐中
+        if(setmealDishService.list(setmealDishLambdaQueryWrapper).isEmpty()) {
+            //其删除口味信息
+            QueryWrapper<DishFlavor> wrapper = new QueryWrapper<>();
+            wrapper.in("dish_id", list);
+            dishFlavorService.remove(wrapper);
+            //删除本地图片信息
+            LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            dishLambdaQueryWrapper.in(Dish::getId,list);
+            List<Dish> list1 = super.list(dishLambdaQueryWrapper);
+            for (Dish dish :list1) {
+                //根据路径创建文件对象
+                File file = new File(Path+dish.getImage());
+                //路径是个文件且不为空时删除文件
+                if(!file.delete()){
+                    throw new CustomException("没有该图片");
+                }
+            }
+            //删除菜品表的信息
+            dishMapper.deleteBatchIds(list);
+
+
+        }else {
+            throw new CustomException("该菜品包含在套餐中,不可直接删除");
+        }
+    }
 
 
 }

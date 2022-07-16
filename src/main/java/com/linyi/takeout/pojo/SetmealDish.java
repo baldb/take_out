@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 /**
- * 菜品管理
- * @TableName dish
+ * 套餐菜品关系
+ * @TableName setmeal_dish
  */
-@TableName(value ="dish")
+@TableName(value ="setmeal_dish")
 @Data
-public class Dish implements Serializable {
+public class SetmealDish implements Serializable {
     /**
      * 主键
      */
@@ -21,42 +21,32 @@ public class Dish implements Serializable {
     private Long id;
 
     /**
-     * 菜品名称
+     * 套餐id 
+     */
+    private String setmealId;
+
+    /**
+     * 菜品id
+     */
+    private String dishId;
+
+    /**
+     * 菜品名称 （冗余字段）
      */
     private String name;
 
     /**
-     * 菜品分类id
-     */
-    private Long categoryId;
-
-    /**
-     * 菜品价格
+     * 菜品原价（冗余字段）
      */
     private BigDecimal price;
 
     /**
-     * 商品码
+     * 份数
      */
-    private String code;
+    private Integer copies;
 
     /**
-     * 图片
-     */
-    private String image;
-
-    /**
-     * 描述信息
-     */
-    private String description;
-
-    /**
-     * 0 停售 1 起售
-     */
-    private Integer status;
-
-    /**
-     * 顺序
+     * 排序
      */
     private Integer sort;
 
@@ -84,17 +74,9 @@ public class Dish implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateUser;
 
-
-    /**
-     * 菜品类别，不是字段中的值
-     */
-    //@TableField(exist = false)
-    //private String categoryName;
-
     /**
      * 是否删除
      */
-    @TableLogic
     private Integer isDeleted;
 
     @TableField(exist = false)
