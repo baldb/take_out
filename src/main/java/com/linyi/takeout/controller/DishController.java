@@ -163,4 +163,28 @@ public class DishController {
         DishDto dishDto = dishService.getByIdWithFlavor(id);
         return R.success(dishDto);
     }
+
+
+    /**
+     * 修改菜品
+     *
+     * @param dishDto
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto) {
+        log.info(dishDto.toString());
+        dishService.updateWithFlavor(dishDto);
+/*
+       删除所有菜品缓存
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
+*/
+
+//        删除单个菜品缓存
+        String key = "dish_" + dishDto.getCategoryId() + "_1";
+        //redisTemplate.delete(key);
+
+        return R.success("修改菜品成功");
+    }
 }

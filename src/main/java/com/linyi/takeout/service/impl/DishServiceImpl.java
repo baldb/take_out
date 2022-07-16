@@ -1,6 +1,7 @@
 package com.linyi.takeout.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linyi.takeout.pojo.Dish;
 import com.linyi.takeout.pojo.DishFlavor;
@@ -83,6 +84,30 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish>
         dishDto.setFlavors(flavors);
 
         return dishDto;
+    }
+
+    /**
+     * 修改菜品信息的信息及其口味
+     * @param dishDto
+     */
+    @Override
+    @Transactional
+    public void updateWithFlavor(DishDto dishDto) {
+               //修改dish表
+        this.updateById(dishDto);
+          //修改口味表,先删除口味信息
+        QueryWrapper<DishFlavor> wrapper = new QueryWrapper<>();
+        wrapper.eq("dish_id", dishDto.getId());
+        dishFlavorService.remove(wrapper);
+
+        //添加当前提交过来的口味数据
+        List<DishFlavor> flavors = dishDto.getFlavors();
+        flavors.stream().map(item -> {
+            item.setDishId(dishDto.getId());
+            return item;
+        }).collect(Collectors.toList());
+
+        dishFlavorService.saveBatch(flavors);
     }
 }
 
