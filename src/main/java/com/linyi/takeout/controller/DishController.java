@@ -7,8 +7,10 @@ package com.linyi.takeout.controller;
  */
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.linyi.takeout.common.R;
+import com.linyi.takeout.mapper.DishMapper;
 import com.linyi.takeout.pojo.Category;
 import com.linyi.takeout.pojo.Dish;
 import com.linyi.takeout.service.CategoryService;
@@ -186,5 +188,42 @@ public class DishController {
         //redisTemplate.delete(key);
 
         return R.success("修改菜品成功");
+    }
+
+
+
+    /**
+     * 单个删除，批量删除菜品
+     */
+    @DeleteMapping
+    public R<String> delDish(@RequestParam("ids") List<Long> ids){
+        log.info("删除的id：{}",ids);
+        /**
+         * 业务逻辑：统一使用批量删除的方法
+         * 删除菜品：前提检查该菜品是否包含在某个套餐里面，没有即可删除
+         * 删除：删除dish表中对应的菜品，还有DishFlavor表中对应菜品的口味，删除该菜品的图片，
+         */
+
+        return null;
+    }
+
+    /**
+     * 单个停售,批量停售。和启售
+     * http://localhost:8080/dish/status/0?ids=1397862198033297410
+     */
+    @PostMapping("/status/{sta}")
+    public R<String> stopshop(@PathVariable("sta") Integer sta,
+                              @RequestParam("ids") List<Long> ids){
+        log.info("状态：{}",sta);
+        log.info("停售的id：{}",ids);
+        /**
+         * 业务逻辑：
+         * 判断status进行停售和启售的动作， 输出0则关闭出售  （1-->起售）--->输出1则开启出售
+         */
+            LambdaUpdateWrapper<Dish> dishLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            dishLambdaUpdateWrapper.in(Dish::getId, ids);
+            dishLambdaUpdateWrapper.set(Dish::getStatus, sta);
+            dishService.update(dishLambdaUpdateWrapper);
+        return sta==0?R.success("已将该商品下架"):R.success("已将该商品上架");
     }
 }
