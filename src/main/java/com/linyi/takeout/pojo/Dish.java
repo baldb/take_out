@@ -84,6 +84,13 @@ public class Dish implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateUser;
 
+
+    /**
+     * 菜品类别，不是字段中的值
+     */
+    //@TableField(exist = false)
+    //private String categoryName;
+
     /**
      * 是否删除
      */

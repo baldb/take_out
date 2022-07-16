@@ -6,6 +6,7 @@ package com.linyi.takeout.controller;
  * 1.0
  */
 
+import com.linyi.takeout.common.CustomException;
 import com.linyi.takeout.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,29 +72,33 @@ public class CommonController {
      * @param response
      */
     @GetMapping("/download")
-    public void download(String name, HttpServletResponse response) throws Exception {
+    public void download(String name, HttpServletResponse response)  {
+        try {
             //读取文件内容
 
-        //输入流，通过输入流读取文件内容
-        FileInputStream fileInputStream = new FileInputStream(new File(basePath + name));
+            //输入流，通过输入流读取文件内容
+            FileInputStream fileInputStream = new FileInputStream(new File(basePath + name));
 
-        // 输出流，通过输出流将文件写入到浏览器，在浏览器展示图片
-        ServletOutputStream outputStream = response.getOutputStream();
-        //设置响应方式，图片文件
-        response.setContentType("image/jpeg");
+            // 输出流，通过输出流将文件写入到浏览器，在浏览器展示图片
+            ServletOutputStream outputStream = response.getOutputStream();
+            //设置响应方式，图片文件
+            response.setContentType("image/jpeg");
 
             //读取一行一行
-        int len = 0;
+            int len = 0;
 
-        byte[] bytes = new byte[1024];
+            byte[] bytes = new byte[1024];
 
-        while ((len = fileInputStream.read(bytes)) != -1) {
-            outputStream.write(bytes, 0, len);
-            outputStream.flush();
+            while ((len = fileInputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, len);
+                outputStream.flush();
+            }
+            //关闭资源
+            outputStream.close();
+            fileInputStream.close();
+        } catch (IOException e) {
+            throw  new CustomException("没有找到该图片:"+name);
         }
-        //关闭资源
-        outputStream.close();
-        fileInputStream.close();
     }
 
 }

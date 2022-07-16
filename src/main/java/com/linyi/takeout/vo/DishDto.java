@@ -19,6 +19,7 @@ public class DishDto extends Dish {
     //菜品口味集合
     private List<DishFlavor> flavors = new ArrayList<>();
 
+    //菜品分类名称
     private String categoryName;
 
     private Integer copies;
