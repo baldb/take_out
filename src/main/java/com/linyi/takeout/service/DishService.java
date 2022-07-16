@@ -2,6 +2,7 @@ package com.linyi.takeout.service;
 
 import com.linyi.takeout.pojo.Dish;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linyi.takeout.vo.DishDto;
 
 /**
 * @author linyi
@@ -10,4 +11,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface DishService extends IService<Dish> {
 
+    /**
+     * 添加菜品功能
+     * @param dishDto
+     */
+    void saveWithFlavor(DishDto dishDto);
 }
