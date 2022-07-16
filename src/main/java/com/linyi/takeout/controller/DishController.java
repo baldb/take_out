@@ -99,18 +99,22 @@ public class DishController {
 
         // 个人理解：定义一个List集合用来存放DishDto类型的数据
         List<DishDto> dtoList = records.stream().map(item -> {
+            //创建 一个这个类型的对象，用来存储数据
             DishDto dishDto = new DishDto();
 
-            //将添加好的数据拷贝到DishDto数据类型的集合中
+            //将不完整的数据先复制/赋值到该对象中
             BeanUtils.copyProperties(item, dishDto);
 
 //            查询数据库中的CategoryName
             Long id = item.getCategoryId();
             if (id != null) {
                 Category category = categoryService.getById(id);
+                //将对象中不完整的数据补全
                 dishDto.setCategoryName(category.getName());
             }
+            //返回一个完整的对象
             return dishDto;
+            //最后将对象一个一个的添加到新的List集合中
         }).collect(Collectors.toList());
 
         dishDtoPage.setRecords(dtoList);
@@ -126,9 +130,6 @@ public class DishController {
      *
      * 而是使用上方这种继承的方式去重新生成一个类去做相关的操作
      *
-     * @param page
-     * @param pageSize
-     * @param name
      * @return
      */
     //@GetMapping("/page")
@@ -151,4 +152,15 @@ public class DishController {
     //    log.info("添加分类后菜品信息：{}",dishPage.getRecords());
     //    return R.success(dishPage);
     //}
+
+    /**
+     * 根据id查询菜品具体信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<DishDto> get(@PathVariable Long id) {
+        DishDto dishDto = dishService.getByIdWithFlavor(id);
+        return R.success(dishDto);
+    }
 }

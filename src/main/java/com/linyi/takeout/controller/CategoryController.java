@@ -100,6 +100,7 @@ public class CategoryController {
     /**
      * 根据条件查询菜品分类数据
      * 使用试题类型去接收参数，可用性更高，局限性小
+     * type:1-->菜品 2-->套餐
      * @param category
      * @return
      * http://localhost:8080/category/list?type=1

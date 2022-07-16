@@ -1,5 +1,6 @@
 package com.linyi.takeout.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linyi.takeout.pojo.Dish;
 import com.linyi.takeout.pojo.DishFlavor;
@@ -8,6 +9,7 @@ import com.linyi.takeout.service.DishService;
 import com.linyi.takeout.mapper.DishMapper;
 import com.linyi.takeout.vo.DishDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +57,32 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish>
 
         //dishFlavorService.saveBatch(dishDto.getFlavors());
         dishFlavorService.saveBatch(flavors);
+    }
+
+    /**
+     * 根据菜品ID查询菜品信息
+     * @param id
+     * @return
+     */
+    @Override
+    public DishDto getByIdWithFlavor(Long id) {
+        //查询菜品基本信息，从dish表查询
+        Dish dish = this.getById(id);
+
+        //查询到只有Dish类的数据
+        DishDto dishDto = new DishDto();
+        //将数据复制给dishDto
+        BeanUtils.copyProperties(dish, dishDto);
+        log.info("菜品分类：{}",dishDto.getCategoryName());
+        //查询当前菜品对应的口味信息，从dish_flavor表查询
+        LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
+        //通过菜品ID去查询菜品口味的全部信息
+        queryWrapper.eq(DishFlavor::getDishId, dish.getId());
+        List<DishFlavor> flavors = dishFlavorService.list(queryWrapper);
+        //最终将菜品口味信息信息全部返回
+        dishDto.setFlavors(flavors);
+
+        return dishDto;
     }
 }
 

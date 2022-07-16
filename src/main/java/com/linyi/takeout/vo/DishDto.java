@@ -1,6 +1,8 @@
 package com.linyi.takeout.vo;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linyi.takeout.pojo.Dish;
 import com.linyi.takeout.pojo.DishFlavor;
 import lombok.Data;
