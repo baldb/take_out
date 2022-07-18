@@ -82,6 +82,7 @@ public class Setmeal implements Serializable {
     /**
      * 是否删除
      */
+    @TableLogic
     private Integer isDeleted;
 
     @TableField(exist = false)
