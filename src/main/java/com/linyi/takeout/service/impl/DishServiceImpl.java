@@ -121,6 +121,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish>
     @Autowired
     private SetmealDishService setmealDishService;
 
+    @Autowired
+    private DishService dishService;
+
     @Value("${reggie.path}")
     private String Path;
 
@@ -135,33 +138,51 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish>
          * 删除菜品：前提检查该菜品是否包含在某个套餐里面，没有即可删除
          * 删除：删除dish表中对应的菜品，还有DishFlavor表中对应菜品的口味，删除该菜品的图片，
          */
-        //判断该菜品是否在套餐中
-        LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        setmealDishLambdaQueryWrapper.in(SetmealDish::getDishId,list);
-        //判断是否为空，即判断是否有在套餐中
-        if(setmealDishService.list(setmealDishLambdaQueryWrapper).isEmpty()) {
-            //其删除口味信息
-            QueryWrapper<DishFlavor> wrapper = new QueryWrapper<>();
-            wrapper.in("dish_id", list);
-            dishFlavorService.remove(wrapper);
-            //删除本地图片信息
-            LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            dishLambdaQueryWrapper.in(Dish::getId,list);
-            List<Dish> list1 = super.list(dishLambdaQueryWrapper);
-            for (Dish dish :list1) {
-                //根据路径创建文件对象
-                File file = new File(Path+dish.getImage());
-                //路径是个文件且不为空时删除文件
-                if(!file.delete()){
-                    throw new CustomException("没有该图片");
+        //针对菜品在售状态看能不能直接删除
+        LambdaQueryWrapper<Dish> dishLambdaQueryWrapper1 = new LambdaQueryWrapper<>();
+        //状态为1，即为在售状态不可以被删除，提示先修改状态
+        dishLambdaQueryWrapper1.eq(Dish::getStatus,1);
+        dishLambdaQueryWrapper1.in(Dish::getId,list);
+        List<Dish> list2 = dishService.list(dishLambdaQueryWrapper1);
+
+        if(list2.isEmpty()){
+            //判断该菜品是否在套餐中
+            LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            setmealDishLambdaQueryWrapper.in(SetmealDish::getDishId,list);
+            //判断是否为空，即判断是否有在套餐中
+            if(setmealDishService.list(setmealDishLambdaQueryWrapper).isEmpty()) {
+                //其删除口味信息
+                QueryWrapper<DishFlavor> wrapper = new QueryWrapper<>();
+                wrapper.in("dish_id", list);
+                dishFlavorService.remove(wrapper);
+                //删除本地图片信息
+                LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                dishLambdaQueryWrapper.in(Dish::getId,list);
+                List<Dish> list1 = super.list(dishLambdaQueryWrapper);
+                for (Dish dish :list1) {
+                    //根据路径创建文件对象
+                    File file = new File(Path+dish.getImage());
+                    //判断删除图片是否成功
+                    try {
+                        if(!file.delete()){
+                            log.info("没有该图片:{}",dish.getImage());
+                            throw new CustomException("没有该图片");
+                        }
+                    } catch (CustomException e) {
+                        e.getMessage();
+                        //e.printStackTrace();
+                    }
                 }
+                //log.info("11111111");
+                //删除菜品表的信息
+                dishMapper.deleteBatchIds(list);
+
+
+            }else {
+                throw new CustomException("该菜品包含在套餐中,不可直接删除");
             }
-            //删除菜品表的信息
-            dishMapper.deleteBatchIds(list);
-
-
-        }else {
-            throw new CustomException("该菜品包含在套餐中,不可直接删除");
+        }else{
+            throw new CustomException("有菜品为在售状态,不可直接删除");
         }
     }
 

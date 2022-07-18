@@ -143,6 +143,7 @@
                 <version>2.3.7.RELEASE</version>
                 <configuration>
                     <mainClass>com.linyi.takeout.TakeoutApplication</mainClass>
+<!--                    <executable>true</executable>-->
                 </configuration>
                 <executions>
                     <execution>

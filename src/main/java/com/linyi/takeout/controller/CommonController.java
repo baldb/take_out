@@ -35,8 +35,6 @@ public class CommonController {
     @PostMapping("/upload")
     public R<String> upload(MultipartFile file) {
 
-
-
         //获取原图片名
         String originalFilename1 = file.getOriginalFilename();
         //截取.jpg
@@ -100,6 +98,7 @@ public class CommonController {
             throw  new CustomException("没有找到该图片:"+name);
         }
     }
+
 
 }
 

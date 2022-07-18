@@ -13,6 +13,7 @@ import com.linyi.takeout.common.R;
 import com.linyi.takeout.mapper.DishMapper;
 import com.linyi.takeout.pojo.Category;
 import com.linyi.takeout.pojo.Dish;
+import com.linyi.takeout.pojo.DishFlavor;
 import com.linyi.takeout.service.CategoryService;
 import com.linyi.takeout.service.DishFlavorService;
 import com.linyi.takeout.service.DishService;
@@ -20,6 +21,7 @@ import com.linyi.takeout.vo.DishDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -195,6 +197,7 @@ public class DishController {
     /**
      * 单个删除，批量删除菜品
      */
+    @Transactional
     @DeleteMapping
     public R<String> delDish(@RequestParam("ids") List<Long> ids){
         log.info("删除的id：{}",ids);
@@ -225,5 +228,26 @@ public class DishController {
             dishLambdaUpdateWrapper.set(Dish::getStatus, sta);
             dishService.update(dishLambdaUpdateWrapper);
         return sta==0?R.success("已将该商品下架"):R.success("已将该商品上架");
+    }
+
+
+    /**
+     * http://localhost:8080/dish/list?categoryId=1397844303408574465
+     * 请求服务端，根据菜品分类查询对应的所有菜品信息，展示添加到对应的窗口中
+     * @param dish
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish) {
+        //构造查询条件
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        //添加条件，查询状态为1（起售状态）的菜品
+        queryWrapper.eq(Dish::getStatus, 1);
+        //添加排序条件
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+        //查找出来的是为启售状态，且菜品分类id为dish.getCategoryId()的菜品信息
+        List<Dish> list = dishService.list(queryWrapper);
+        return R.success(list);
     }
 }
