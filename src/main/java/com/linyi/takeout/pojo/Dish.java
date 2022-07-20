@@ -5,7 +5,12 @@ import com.baomidou.mybatisplus.annotation.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import lombok.Data;
+import org.springframework.context.annotation.Bean;
 
 /**
  * 菜品管理
@@ -100,3 +105,6 @@ public class Dish implements Serializable {
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }
+
+
+

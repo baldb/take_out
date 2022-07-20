@@ -57,7 +57,8 @@ public class CommonController {
             file.transferTo(new File(basePath + fileName));
 
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            new CustomException("上传失败~");
         }
         return R.success(fileName);
     }
