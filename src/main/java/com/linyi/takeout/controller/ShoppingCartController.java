@@ -2,6 +2,7 @@ package com.linyi.takeout.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.linyi.takeout.common.BaseContext;
 import com.linyi.takeout.common.R;
 import com.linyi.takeout.pojo.ShoppingCart;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,10 +32,12 @@ public class ShoppingCartController {
      * @return
      */
     @PostMapping("add")
-    public R<ShoppingCart> addShort(@RequestBody ShoppingCart shoppingCart) {
+    public R<ShoppingCart> addShort(@RequestBody ShoppingCart shoppingCart,
+                                    HttpServletRequest request) {
 
 //        获取用户id
-        Long userId = BaseContext.getCurrentId();
+//        Long userId = BaseContext.getCurrentId();
+        Long userId = (Long)request.getSession().getAttribute("user");
         shoppingCart.setUserId(userId);
 //        查询购物车数据是否存在
         Long dishId = shoppingCart.getDishId();
@@ -98,6 +102,41 @@ public class ShoppingCartController {
 
         shoppingCartService.remove(queryWrapper);
         return R.success("清空购物车成功");
+    }
+
+
+    /**
+     * http://localhost:8080/shoppingCart/sub
+     */
+    @PostMapping("/sub")
+    public R<String> reduceShopCart(@RequestBody ShoppingCart shoppingCart,HttpServletRequest request){
+        log.info("删除购物车中菜品的数量的菜品id为：{}",shoppingCart.getDishId());
+        log.info("删除购物车中套餐的数量的菜品id为：{}",shoppingCart.getSetmealId());
+        Long userId = (Long)request.getSession().getAttribute("user");
+        if(shoppingCart.getDishId()!=null){
+            LambdaQueryWrapper<ShoppingCart> shoppingCartLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            shoppingCartLambdaQueryWrapper.eq(ShoppingCart::getDishId,shoppingCart.getDishId())
+                    .eq(ShoppingCart::getUserId,userId);
+            ShoppingCart shoppingCartServiceOne = shoppingCartService.getOne(shoppingCartLambdaQueryWrapper);
+            if(shoppingCartServiceOne.getNumber()==1){
+                shoppingCartService.removeById(shoppingCartServiceOne);
+            }else {
+                shoppingCartServiceOne.setNumber(shoppingCartServiceOne.getNumber()-1);
+                shoppingCartService.updateById(shoppingCartServiceOne);
+            }
+        }else if(shoppingCart.getSetmealId()!=null){
+            LambdaQueryWrapper<ShoppingCart> shoppingCartLambdaQueryWrapper1 = new LambdaQueryWrapper<>();
+            shoppingCartLambdaQueryWrapper1.eq(ShoppingCart::getSetmealId,shoppingCart.getSetmealId())
+                    .eq(ShoppingCart::getUserId,userId);
+            ShoppingCart shoppingCartServiceOne = shoppingCartService.getOne(shoppingCartLambdaQueryWrapper1);
+            if(shoppingCartServiceOne.getNumber()==1){
+                shoppingCartService.removeById(shoppingCartServiceOne);
+            }else {
+                shoppingCartServiceOne.setNumber(shoppingCartServiceOne.getNumber()-1);
+                shoppingCartService.updateById(shoppingCartServiceOne);
+            }
+        }
+        return R.success("success~");
     }
 
 }

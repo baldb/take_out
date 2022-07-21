@@ -1,19 +1,20 @@
 package com.linyi.takeout.pojo;
 
-import com.baomidou.mybatisplus.annotation.*;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import lombok.Data;
 
 /**
- * 购物车
- * @TableName shopping_cart
+ * 订单明细表
+ * @TableName order_detail
  */
-@TableName(value ="shopping_cart")
+@TableName(value ="order_detail")
 @Data
-public class ShoppingCart implements Serializable {
+public class OrderDetail implements Serializable {
     /**
      * 主键
      */
@@ -21,7 +22,7 @@ public class ShoppingCart implements Serializable {
     private Long id;
 
     /**
-     * 名称
+     * 名字
      */
     private String name;
 
@@ -31,9 +32,9 @@ public class ShoppingCart implements Serializable {
     private String image;
 
     /**
-     * 主键
+     * 订单id
      */
-    private Long userId;
+    private Long orderId;
 
     /**
      * 菜品id
@@ -59,17 +60,6 @@ public class ShoppingCart implements Serializable {
      * 金额
      */
     private BigDecimal amount;
-
-    /**
-     * 是否删除
-     */
-    @TableLogic
-    private Integer isDeleted;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
