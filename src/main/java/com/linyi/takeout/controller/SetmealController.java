@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.linyi.takeout.common.BaseContext;
 import com.linyi.takeout.common.R;
 import com.linyi.takeout.pojo.Category;
 import com.linyi.takeout.pojo.Dish;
 import com.linyi.takeout.pojo.Setmeal;
+import com.linyi.takeout.pojo.SetmealDish;
 import com.linyi.takeout.service.CategoryService;
 import com.linyi.takeout.service.SetmealDishService;
 import com.linyi.takeout.service.SetmealService;
@@ -21,6 +23,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -167,4 +170,72 @@ public class SetmealController {
         List<Setmeal> list = setmealService.list(queryWrapper);
         return R.success(list);
     }
+
+
+    /**
+     * 回显套餐
+     * @param setmealId
+     * @param request
+     * @return
+     */
+    @GetMapping("/{setmealId}")
+    public R<SetmealDto> getSetmeal(@PathVariable Long setmealId,
+                                HttpServletRequest request){
+        Long currentId = BaseContext.getCurrentId();
+        log.info("BaseContext.getCurrentId()：{}",currentId);
+        log.info("session ID user：{}",request.getSession().getAttribute("user"));
+        //        查询套餐表
+        Setmeal setmeal = setmealService.getById(setmealId);
+
+        SetmealDto setmealDto = new SetmealDto();
+
+        BeanUtils.copyProperties(setmeal, setmealDto);
+
+//        查询套餐关联表
+        QueryWrapper<SetmealDish> wrapper = new QueryWrapper<>();
+        wrapper.eq("setmeal_id", setmealId);
+        List<SetmealDish> dishList = setmealDishService.list(wrapper);
+        setmealDto.setSetmealDishes(dishList);
+        return R.success(setmealDto);
+    }
+
+
+
+    /**
+     * 修改套餐
+     *
+     * @param setmealDto
+     * @return
+     */
+    @PutMapping
+//    当修改数据或添加数据时清除缓存
+    @CacheEvict(value = "setmealCache", allEntries = true)
+    public R<String> update(@RequestBody SetmealDto setmealDto) {
+
+        log.info("setmealDto:{}", setmealDto);
+//        修改套餐表
+        setmealService.updateById(setmealDto);
+
+////        修改套餐关联表
+        Long id = setmealDto.getId();
+        QueryWrapper<SetmealDish> wrapper = new QueryWrapper<>();
+        wrapper.eq("setmeal_id", setmealDto.getId());
+        setmealDishService.remove(wrapper);
+
+//        保存提交过来的数据
+
+        List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
+
+        List<SetmealDish> setmealDishList = setmealDishes.stream().map(item -> {
+            item.setSetmealId(setmealDto.getId()+"");
+            return item;
+        }).collect(Collectors.toList());
+
+
+        setmealDishService.saveBatch(setmealDishes);
+
+        return R.success("修改套餐成功");
+    }
+
+
 }
